@@ -1,0 +1,37 @@
+#include "mbed.h"
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial)
+    delay(10);
+
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+}
+
+void loop() {
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  int redValue = map(a.acceleration.x, -8, 8, 0, 255);
+  int greenValue = map(a.acceleration.y, -8, 8, 0, 255);
+  int blueValue = map(a.acceleration.z, -8, 8, 0, 255);
+
+  analogWrite(9, redValue);
+  analogWrite(10, greenValue);
+  analogWrite(11, blueValue);
+
+  delay(10);
+}
